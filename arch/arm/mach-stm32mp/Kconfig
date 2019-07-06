@@ -47,9 +47,31 @@ config TARGET_STM32MP1
 		STMicroelectronics MPU with core ARMv7
 		dual core A7 for STM32MP153, monocore for STM32MP151
 
+config TARGET_PANGU
+	bool "Support i2SOM PanGu board with stm32mp1xx"
+	select ARCH_SUPPORT_PSCI if !STM32MP1_TRUSTED
+	select CPU_V7A
+	select CPU_V7_HAS_NONSEC if !STM32MP1_TRUSTED
+	select CPU_V7_HAS_VIRT
+	select OF_BOARD_SETUP
+	select PINCTRL_STM32
+	select STM32_RCC
+	select STM32_RESET
+	select STM32_SERIAL
+	imply BOOTCOUNT_LIMIT
+	imply SYSRESET_PSCI if STM32MP1_TRUSTED
+	imply SYSRESET_SYSCON if !STM32MP1_TRUSTED
+	help
+		target STMicroelectronics SOC STM32MP1 family
+		STM32MP153 or STM32MP151
+		STMicroelectronics MPU with core ARMv7
+		dual core A7 for STM32MP153, monocore for STM32MP151
+
+
 config STM32MP1_RESET_HALT_WORKAROUND
 	bool "workaround for reset halt deubg on stm32mp15x"
 	depends on TARGET_STM32MP1
+	depends on TARGET_PANGU
 	default y
 	help
 		Activate a workaround for current STM32MP15x revision B
@@ -82,7 +104,7 @@ config STM32MP1_OPTEE
 
 config SYS_MMCSD_RAW_MODE_U_BOOT_PARTITION_MMC2
 	hex "Partition to use for MMC2 to load U-Boot from"
-	depends on SYS_MMCSD_RAW_MODE_U_BOOT_USE_PARTITION && TARGET_STM32MP1
+	depends on SYS_MMCSD_RAW_MODE_U_BOOT_USE_PARTITION && TARGET_STM32MP1 || TARGET_PANGU
 	default 1
 	help
 	  Partition on the MMC2 to load U-Boot from when the MMC2 is being
@@ -90,13 +112,14 @@ config SYS_MMCSD_RAW_MODE_U_BOOT_PARTITION_MMC2
 
 config STM32_ETZPC
 	bool "STM32 Extended TrustZone Protection"
-	depends on TARGET_STM32MP1
+	depends on TARGET_STM32MP1 || TARGET_PANGU
 	default y
 	help
 	  Say y to enable STM32 Extended TrustZone Protection
 	  Controller (ETZPC)
 
 source "board/st/stm32mp1/Kconfig"
+source "board/i2som/pangu/Kconfig"
 
 config CMD_STM32PROG
 	bool "command stm32prog for STM32CudeProgrammer"

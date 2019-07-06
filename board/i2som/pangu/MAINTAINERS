@@ -1,0 +1,9 @@
+i2SOM PanGu BOARD
+M:	Steve Chen <steve.chen@i2som.tech>
+S:	Maintained
+F:	arch/arm/dts/stm32mp157a-panguboard*
+F:	board/i2som/pangu/stm32mp1
+F:	configs/pangu_trusted_defconfig
+F:	configs/pangu_optee_defconfig
+F:	configs/pangu_basic_defconfig
+F:	include/configs/pangu.h

@@ -1,0 +1,19 @@
+if TARGET_PANGU
+
+config SYS_BOARD
+	default "pangu"
+
+config SYS_VENDOR
+	default "i2som"
+
+config SYS_CONFIG_NAME
+	default "pangu"
+
+config CMD_STBOARD
+	bool "stboard - command for OTP board information"
+	default y
+	help
+	  This compile the stboard command to
+	  read and write the board in the OTP.
+
+endif
