@@ -168,7 +168,7 @@ bool board_is_dk2(void)
 
 bool board_is_pangu(void)
 {
-	if (of_machine_is_compatible("i2som,pangu"))
+	if (of_machine_is_compatible("i2som,panguboard"))
 		return true;
 
 	return false;
