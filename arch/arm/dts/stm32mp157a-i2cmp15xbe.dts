@@ -14,7 +14,7 @@
 
 / {
 	model = "i2SOM i2S-MP15X eMMC module";
-	compatible = "i2som,i2smp15x", "st,stm32mp157";
+	compatible = "i2som,i2cmp15xbe", "st,stm32mp157";
 
 	aliases {
 		ethernet0 = &ethernet0;

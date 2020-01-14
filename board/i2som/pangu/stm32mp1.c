@@ -174,6 +174,14 @@ bool board_is_pangu(void)
 	return false;
 }
 
+bool board_is_i2smp15x(void)
+{
+	if (of_machine_is_compatible("i2som,i2cmp15xbe") ||
+	    of_machine_is_compatible("i2som,i2cmp15xbn"))
+		return true;
+
+	return false;
+}
 
 int board_late_init(void)
 {
@@ -894,6 +902,9 @@ int board_init(void)
 		dk2_i2c1_fix();
 
 	if (board_is_pangu())
+		pangu_i2c1_fix();
+
+	if (board_is_i2smp15x())
 		pangu_i2c1_fix();
 
 	regulators_enable_boot_on(_DEBUG);
