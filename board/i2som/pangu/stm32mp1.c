@@ -813,21 +813,33 @@ error:
 static int pangu_i2c1_fix(void)
 {
 	ofnode node;
-	struct gpio_desc rgb, audio;
+	struct gpio_desc rgb, audio, eth_rst, wifi, lte;
 	int ret = 0;
 
 	node = ofnode_path("/panel-rgb");
 	if (!ofnode_valid(node)) {
 		printf("%s: no panel_rgb ?\n", __func__);
-		return -ENOENT;
+	}else{
+
+		if (gpio_request_by_name_nodev(node, "reset-gpios", 0,
+					       &rgb, GPIOD_IS_OUT)) {
+			printf("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		ret = dm_gpio_set_value(&rgb, 1);
+		if (ret) {
+			pr_err("%s: can't set_value for rgb lcd reset gpio", __func__);
+			goto error;
+		}
+		ret = dm_gpio_set_value(&rgb, 0);
+		if (ret) {
+			pr_err("%s: can't set_value for rgb lcd reset gpio", __func__);
+			goto error;
+		}
 	}
 
-	if (gpio_request_by_name_nodev(node, "reset-gpios", 0,
-				       &rgb, GPIOD_IS_OUT)) {
-		printf("%s: could not find reset-gpios\n",
-			 __func__);
-		return -ENOENT;
-	}
 #if 0
 	node = ofnode_path("/soc/i2c@40012000/cs42l51@4a");
 	if (!ofnode_valid(node)) {
@@ -860,15 +872,113 @@ static int pangu_i2c1_fix(void)
 	regulator_autoset_by_name("v1v2_hdmi", NULL);
 	regulator_autoset_by_name("v3v3_hdmi", NULL);
 #endif
-	ret = dm_gpio_set_value(&rgb, 1);
-	if (ret) {
-		pr_err("%s: can't set_value for rgb lcd reset gpio", __func__);
-		goto error;
+	node = ofnode_path("/soc/ethernet@5800a000");
+	if (!ofnode_valid(node)) {
+		pr_err("%s: no ethernet ?\n", __func__);
+	}else{
+
+		if (gpio_request_by_name_nodev(node, "reset-gpios", 0,
+					       &eth_rst, GPIOD_IS_OUT)) {
+			pr_err("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		if(dm_gpio_is_valid(&eth_rst)){
+			ret = dm_gpio_set_value(&eth_rst, 0);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+	/*
+			ret = dm_gpio_set_value(&eth_rst, 0);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+
+			ret = dm_gpio_set_value(&eth_rst, 1);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+	*/
+		}
 	}
-	ret = dm_gpio_set_value(&rgb, 0);
-	if (ret) {
-		pr_err("%s: can't set_value for rgb lcd reset gpio", __func__);
-		goto error;
+
+	node = ofnode_path("/wifi-module");
+	if (!ofnode_valid(node)) {
+		pr_err("%s: no wifi-module node ?\n", __func__);
+	}else{
+
+		if (gpio_request_by_name_nodev(node, "power-gpios", 0,
+					       &wifi, GPIOD_IS_OUT)) {
+			pr_err("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		if(dm_gpio_is_valid(&wifi)){
+			printf("%s: set wifi module pwr\n", __func__);
+			ret = dm_gpio_set_value(&wifi, 1);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+		}
+
+		if (gpio_request_by_name_nodev(node, "wifi-reg-gpios", 0,
+					       &wifi, GPIOD_IS_OUT)) {
+			pr_err("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		if(dm_gpio_is_valid(&wifi)){
+			printf("%s: set wifi enable pwr\n", __func__);
+			ret = dm_gpio_set_value(&wifi, 1);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+		}
+
+		if (gpio_request_by_name_nodev(node, "bt-reg-gpios", 0,
+					       &wifi, GPIOD_IS_OUT)) {
+			pr_err("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		if(dm_gpio_is_valid(&wifi)){
+			ret = dm_gpio_set_value(&wifi, 1);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+		}
+	}
+
+	node = ofnode_path("/lte-module");
+	if (!ofnode_valid(node)) {
+		pr_err("%s: no lte-module node ?\n", __func__);
+	}else{
+
+		if (gpio_request_by_name_nodev(node, "power-gpios", 0,
+					       &lte, GPIOD_IS_OUT)) {
+			pr_err("%s: could not find reset-gpios\n",
+				 __func__);
+			return -ENOENT;
+		}
+
+		if(dm_gpio_is_valid(&lte)){
+			printf("%s: set lte module pwr\n", __func__);
+			ret = dm_gpio_set_value(&lte, 1);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+		}
 	}
 
 error:
