@@ -164,6 +164,11 @@
 		};
 	};
 
+	wifi_pwrseq: wifi-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&gpiof 2 GPIO_ACTIVE_LOW>;
+	};
+
 	sound {
 		compatible = "audio-graph-card";
 		label = "wm8904-KenQue";
@@ -336,6 +341,68 @@
 		};
 	};
 
+	spi2_pins_a: spi2-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('I', 1, AF5)>, /* SPI2_SCK */
+				 <STM32_PINMUX('I', 3, AF5)>; /* SPI2_MOSI */
+				 bias-disable;
+				 drive-push-pull;
+				 slew-rate = <1>;
+		};
+
+		pins2 {
+			pinmux = <STM32_PINMUX('I', 2, AF5)>; /* SPI2_MISO */
+			bias-disable;
+		};
+	};
+
+	spi2_sleep_pins_a: spi2-sleep-0 {
+		pins {
+			pinmux = <STM32_PINMUX('I', 1, ANALOG)>, /* SPI2_SCK */
+				 <STM32_PINMUX('I', 2, ANALOG)>, /* SPI2_MISO */
+				 <STM32_PINMUX('I', 3, ANALOG)>; /* SPI2_MOSI */
+		};
+	};
+
+	spi6_pins_a: spi6-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('Z', 0, AF8)>, /* SPI4_SCK */
+				 <STM32_PINMUX('Z', 2, AF8)>; /* SPI4_MOSI */
+				 bias-disable;
+				 drive-push-pull;
+				 slew-rate = <1>;
+			};
+
+		pins2 {
+			pinmux = <STM32_PINMUX('Z', 1, AF8)>; /* SPI4_MISO */
+			bias-disable;
+		};
+	};
+
+	spi6_sleep_pins_a: spi6-sleep-0 {
+		pins {
+			pinmux = <STM32_PINMUX('Z', 0, ANALOG)>, /* SPI4_SCK */
+				 <STM32_PINMUX('Z', 1, ANALOG)>, /* SPI4_MISO */
+				 <STM32_PINMUX('Z', 2, ANALOG)>; /* SPI4_MOSI */
+		};
+	};
+
+	i2c1_pins_b: i2c1-b-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 14, AF5)>, /* I2C1_SCL */
+				 <STM32_PINMUX('F', 15, AF5)>; /* I2C1_SDA */
+				 bias-disable;
+				 drive-open-drain;
+				 slew-rate = <0>;
+		};
+	};
+
+	i2c1_pins_sleep_b: i2c1-b-1 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 14, ANALOG)>, /* I2C1_SCL */
+				 <STM32_PINMUX('F', 15, ANALOG)>; /* I2C1_SDA */
+		};
+	};
 };
 
 &fmc {
@@ -395,6 +462,46 @@
 &gpu {
 	contiguous-area = <&gpu_reserved>;
 	status = "okay";
+};
+
+&i2c1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c1_pins_b>;
+	pinctrl-1 = <&i2c1_pins_sleep_b>;
+	i2c-scl-rising-time-ns = <100>;
+	i2c-scl-falling-time-ns = <7>;
+	status = "okay";
+	/delete-property/dmas;
+	/delete-property/dma-names;
+
+	wm8904_codec: wm8904@1a {
+		compatible = "wlf,wm8904";
+		#sound-dai-cells = <0>;
+		reg = <0x1a>;
+		status = "okay";
+
+		clocks = <&sai2a>;
+		clock-names = "mclk";
+
+		wm8904_port: port {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			wm8904_tx_endpoint: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&sai2a_endpoint>;
+				frame-master;
+				bitclock-master;
+			};
+
+			wm8904_rx_endpoint: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&sai2b_endpoint>;
+				frame-master;
+				bitclock-master;
+			};
+		};
+	};
 };
 
 &i2c2 {
