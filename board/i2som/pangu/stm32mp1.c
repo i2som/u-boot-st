@@ -823,7 +823,7 @@ static int pangu_i2c1_fix(void)
 
 		if (gpio_request_by_name_nodev(node, "reset-gpios", 0,
 					       &rgb, GPIOD_IS_OUT)) {
-			printf("%s: could not find reset-gpios\n",
+			printf("%s: could not find panel-rgb reset-gpios\n",
 				 __func__);
 			return -ENOENT;
 		}
@@ -879,7 +879,7 @@ static int pangu_i2c1_fix(void)
 
 		if (gpio_request_by_name_nodev(node, "reset-gpios", 0,
 					       &eth_rst, GPIOD_IS_OUT)) {
-			pr_err("%s: could not find reset-gpios\n",
+			pr_err("%s: could not find ethernet reset-gpios\n",
 				 __func__);
 			return -ENOENT;
 		}
@@ -913,13 +913,12 @@ static int pangu_i2c1_fix(void)
 
 		if (gpio_request_by_name_nodev(node, "power-gpios", 0,
 					       &wifi, GPIOD_IS_OUT)) {
-			pr_err("%s: could not find reset-gpios\n",
+			pr_err("%s: could not find wifi-module reset-gpios\n",
 				 __func__);
 			return -ENOENT;
 		}
 
 		if(dm_gpio_is_valid(&wifi)){
-			printf("%s: set wifi module pwr\n", __func__);
 			ret = dm_gpio_set_value(&wifi, 1);
 			if (ret) {
 				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
@@ -929,13 +928,12 @@ static int pangu_i2c1_fix(void)
 
 		if (gpio_request_by_name_nodev(node, "wifi-reg-gpios", 0,
 					       &wifi, GPIOD_IS_OUT)) {
-			pr_err("%s: could not find reset-gpios\n",
+			pr_err("%s: could not find wifi-module wifi-reg-gpios\n",
 				 __func__);
 			return -ENOENT;
 		}
 
 		if(dm_gpio_is_valid(&wifi)){
-			printf("%s: set wifi enable pwr\n", __func__);
 			ret = dm_gpio_set_value(&wifi, 1);
 			if (ret) {
 				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
@@ -945,7 +943,7 @@ static int pangu_i2c1_fix(void)
 
 		if (gpio_request_by_name_nodev(node, "bt-reg-gpios", 0,
 					       &wifi, GPIOD_IS_OUT)) {
-			pr_err("%s: could not find reset-gpios\n",
+			pr_err("%s: could not find wifi-module bt-reg-gpios\n",
 				 __func__);
 			return -ENOENT;
 		}
@@ -972,7 +970,6 @@ static int pangu_i2c1_fix(void)
 		}
 
 		if(dm_gpio_is_valid(&lte)){
-			printf("%s: set lte module pwr\n", __func__);
 			ret = dm_gpio_set_value(&lte, 1);
 			if (ret) {
 				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
