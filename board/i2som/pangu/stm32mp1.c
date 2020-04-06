@@ -890,19 +890,21 @@ static int pangu_i2c1_fix(void)
 				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
 				goto error;
 			}
-	/*
-			ret = dm_gpio_set_value(&eth_rst, 0);
-			if (ret) {
-				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
-				goto error;
-			}
+			mdelay(1);
 
 			ret = dm_gpio_set_value(&eth_rst, 1);
 			if (ret) {
 				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
 				goto error;
 			}
-	*/
+			mdelay(1);
+
+			ret = dm_gpio_set_value(&eth_rst, 0);
+			if (ret) {
+				pr_err("%s: can't set_value for ethernet reset gpio", __func__);
+				goto error;
+			}
+
 		}
 	}
 
